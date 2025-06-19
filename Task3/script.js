@@ -1,144 +1,184 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const productsGrid = document.getElementById('products-grid');
     const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const errorMessage = document.getElementById('error-message');
-    const productsContainer = document.getElementById('products-container');
-    const sortSelect = document.getElementById('sort-select');
-    const resultsCount = document.getElementById('results-count');
-    let products = [];
-    let isLoading = false;
-    fetchProducts('https://dummyjson.com/products');
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSearch());
-    sortSelect.addEventListener('change', () => sortProducts(sortSelect.value));
-    function handleSearch() {
-        const searchTerm = searchInput.value.trim();
+    const searchButton = document.getElementById('search-button');
+    const sortBy = document.getElementById('sort-by');
+    const brandFilter = document.getElementById('brand-filter');
+    const minPrice = document.getElementById('min-price');
+    const maxPrice = document.getElementById('max-price');
+    
+    let allProducts = [];
+    let displayedProducts = [];
+    
+    function fetchProducts(url) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                allProducts = data.products;
+                displayedProducts = [...allProducts];
+                renderProducts(displayedProducts);
+                populateBrandFilter();
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                showEmptyState('Failed to load products. Please try again later.');
+            });
+    }
+    
+    function populateBrandFilter() {
+        const brands = [...new Set(allProducts.map(product => product.brand))].filter(b => b);
+        brands.sort().forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand;
+            option.textContent = brand;
+            brandFilter.appendChild(option);
+        });
+    }
+    
+    function renderProducts(products) {
+        productsGrid.innerHTML = '';
         
-        if (!searchTerm) {
-            showError('Please enter a search term');
-            searchInput.focus();
+        if (products.length === 0) {
+            showEmptyState('No products found. Try adjusting your filters.');
             return;
         }
         
-        clearError();
-        showLoading();
-        
-        fetchProducts(`https://dummyjson.com/products/search?q=${encodeURIComponent(searchTerm)}`);
-    }
-    
-    async function fetchProducts(url) {
-        try {
-            isLoading = true;
-            const response = await fetch(url);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            products = data.products || [];
-            
-            displayProducts(products);
-            updateResultsCount(products.length);
-        } catch (error) {
-            console.error('Fetch error:', error);
-            showError('Failed to load products. Please try again later.');
-            displayEmptyState();
-        } finally {
-            isLoading = false;
-        }
-    }
-    
-    function displayProducts(productsToDisplay) {
-        if (!productsToDisplay.length) {
-            displayEmptyState();
-            return;
-        }
-        
-        productsContainer.innerHTML = '';
-        
-        const productsGrid = document.createElement('div');
-        productsGrid.className = 'products-grid';
-        
-        productsToDisplay.forEach(product => {
-            const discountPercentage = Math.round(product.discountPercentage);
-            
+        products.forEach((product, index) => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+            productCard.style.animationDelay = `${index * 0.1}s`;
+            
+            const discountPercentage = product.discountPercentage ? Math.round(product.discountPercentage) : 0;
+            
             productCard.innerHTML = `
+                ${discountPercentage > 0 ? `<span class="product-badge">${discountPercentage}% OFF</span>` : ''}
                 <div class="product-image-container">
                     <img src="${product.thumbnail}" alt="${product.title}" class="product-image">
-                    ${discountPercentage > 0 ? `<span class="product-badge">-${discountPercentage}%</span>` : ''}
                 </div>
                 <div class="product-info">
+                    <p class="product-brand">${product.brand || 'Generic'}</p>
                     <h3 class="product-title">${product.title}</h3>
                     <p class="product-price">$${product.price}</p>
                     <div class="product-rating">
-                        <div class="stars">
-                            ${'<i class="fas fa-star"></i>'.repeat(Math.floor(product.rating))}
-                            ${product.rating % 1 >= 0.5 ? '<i class="fas fa-star-half-alt"></i>' : ''}
-                            ${'<i class="far fa-star"></i>'.repeat(5 - Math.ceil(product.rating))}
-                        </div>
-                        <span class="rating-value">${product.rating.toFixed(1)}</span>
+                        <i class="fas fa-star"></i>
+                        <span>${product.rating}</span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="wishlist-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="add-to-cart">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
                     </div>
                 </div>
             `;
             
             productsGrid.appendChild(productCard);
         });
-        
-        productsContainer.appendChild(productsGrid);
     }
     
-    function sortProducts(sortType) {
-        if (isLoading || !products.length) return;
-        
-        const [field, order] = sortType.split('-');
-        
-        const sortedProducts = [...products].sort((a, b) => {
-            return order === 'asc' ? a[field] - b[field] : b[field] - a[field];
-        });
-        
-        displayProducts(sortedProducts);
-    }
-    
-    function showLoading() {
-        productsContainer.innerHTML = `
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading products...</p>
-            </div>
-        `;
-    }
-    
-    function displayEmptyState() {
-        productsContainer.innerHTML = `
+    function showEmptyState(message) {
+        productsGrid.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">
-                    <i class="far fa-folder-open"></i>
+                    <i class="fas fa-box-open"></i>
                 </div>
-                <h3 class="empty-text">No products found</h3>
-                <p>Try a different search term</p>
+                <h3 class="empty-title">No Products Found</h3>
+                <p class="empty-description">${message}</p>
+                <button class="add-to-cart" onclick="resetFilters()">
+                    <i class="fas fa-sync-alt"></i> Reset Filters
+                </button>
             </div>
         `;
-        updateResultsCount(0);
     }
     
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-        setTimeout(() => errorMessage.style.opacity = '1', 10);
+    function sortProducts() {
+        const sortValue = sortBy.value;
+        
+        switch(sortValue) {
+            case 'price-asc':
+                displayedProducts.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                displayedProducts.sort((a, b) => b.price - a.price);
+                break;
+            case 'rating-asc':
+                displayedProducts.sort((a, b) => a.rating - b.rating);
+                break;
+            case 'rating-desc':
+                displayedProducts.sort((a, b) => b.rating - a.rating);
+                break;
+            default:
+                displayedProducts = [...allProducts];
+                break;
+        }
+        
+        applyProductFilters();
     }
     
-    function clearError() {
-        errorMessage.style.opacity = '0';
-        setTimeout(() => {
-            errorMessage.textContent = '';
-            errorMessage.style.display = 'none';
-        }, 300);
+    function applyProductFilters() {
+        const selectedBrand = brandFilter.value;
+        const minPriceValue = parseFloat(minPrice.value) || 0;
+        const maxPriceValue = parseFloat(maxPrice.value) || Infinity;
+        
+        let filteredProducts = [...displayedProducts];
+        
+        if (selectedBrand) {
+            filteredProducts = filteredProducts.filter(product => 
+                product.brand === selectedBrand
+            );
+        }
+        
+        filteredProducts = filteredProducts.filter(product => 
+            product.price >= minPriceValue && product.price <= maxPriceValue
+        );
+        
+        renderProducts(filteredProducts);
     }
     
-    function updateResultsCount(count) {
-        resultsCount.textContent = `${count} ${count === 1 ? 'result' : 'results'} found`;
+    function searchProducts() {
+        const searchTerm = searchInput.value.trim();
+        
+        if (searchTerm === '') {
+            fetchProducts('https://dummyjson.com/products');
+            return;
+        }
+        
+        fetch(`https://dummyjson.com/products/search?q=${encodeURIComponent(searchTerm)}`)
+            .then(response => response.json())
+            .then(data => {
+                allProducts = data.products;
+                displayedProducts = [...allProducts];
+                sortProducts();
+            })
+            .catch(error => {
+                console.error('Error searching products:', error);
+                showEmptyState('Search failed. Please try again.');
+            });
     }
+    
+    window.resetFilters = function() {
+        sortBy.value = '';
+        brandFilter.value = '';
+        minPrice.value = '';
+        maxPrice.value = '';
+        searchInput.value = '';
+        fetchProducts('https://dummyjson.com/products');
+    };
+    
+    searchButton.addEventListener('click', searchProducts);
+    
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchProducts();
+        }
+    });
+    
+    sortBy.addEventListener('change', sortProducts);
+    brandFilter.addEventListener('change', applyProductFilters);
+    minPrice.addEventListener('input', applyProductFilters);
+    maxPrice.addEventListener('input', applyProductFilters);
+    
+    fetchProducts('https://dummyjson.com/products');
 });
