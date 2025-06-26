@@ -1,0 +1,10 @@
+<%- include("../partials/header") %>
+<h2>Edit Vehicle</h2>
+<form action="/vehicles/<%= vehicle._id %>?_method=PUT" method="POST">
+  <input name="vehicleName" value="<%= vehicle.vehicleName %>" />
+  <input name="price" value="<%= vehicle.price %>" />
+  <input name="image" value="<%= vehicle.image %>" />
+  <input name="brand" value="<%= vehicle.brand %>" />
+  <textarea name="desc"><%= vehicle.desc %></textarea>
+  <button type="submit">Update</button>
+</form>

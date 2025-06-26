@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="/styles.css" />
+<nav>
+  <a href="/vehicles">Home</a>
+  <% if (!currentUser) { %>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+  <% } else { %>
+    <a href="/logout">Logout</a>
+  <% } %>
+</nav>
+<hr />

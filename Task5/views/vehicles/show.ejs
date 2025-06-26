@@ -1,0 +1,10 @@
+<%- include("../partials/header") %>
+<h2><%= vehicle.vehicleName %></h2>
+<img src="<%= vehicle.image %>" width="300" />
+<p><%= vehicle.desc %></p>
+<p>Price: ₹<%= vehicle.price %></p>
+<p>Brand: <%= vehicle.brand %></p>
+<a href="/vehicles/<%= vehicle._id %>/edit">Edit</a>
+<form action="/vehicles/<%= vehicle._id %>?_method=DELETE" method="POST">
+  <button type="submit">Delete</button>
+</form>

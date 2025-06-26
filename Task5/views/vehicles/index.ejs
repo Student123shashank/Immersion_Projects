@@ -1,0 +1,10 @@
+<%- include("../partials/header") %>
+<h2>All Vehicles</h2>
+<a href="/vehicles/new">Add New</a>
+<ul>
+  <% vehicles.forEach(v => { %>
+    <li>
+      <a href="/vehicles/<%= v._id %>"><%= v.vehicleName %></a> - ₹<%= v.price %>
+    </li>
+  <% }) %>
+</ul>

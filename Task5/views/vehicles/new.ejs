@@ -1,0 +1,10 @@
+<%- include("../partials/header") %>
+<h2>New Vehicle</h2>
+<form action="/vehicles" method="POST">
+  <input name="vehicleName" placeholder="Vehicle Name" required />
+  <input name="price" placeholder="Price" required />
+  <input name="image" placeholder="Image URL" required />
+  <input name="brand" placeholder="Brand" required />
+  <textarea name="desc" placeholder="Description"></textarea>
+  <button type="submit">Add Vehicle</button>
+</form>
