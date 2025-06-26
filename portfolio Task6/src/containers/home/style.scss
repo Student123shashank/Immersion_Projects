@@ -1,0 +1,113 @@
+.home {
+  position: relative;
+  min-height: 100vh; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  padding-top: 100px; 
+}
+.home__text-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  flex-grow: 1; 
+  h1 {
+    color: var(--yellow-theme-main-color);
+    margin: 0px;
+    font-weight: 500;
+    font-size: 8rem;
+    line-height: 10rem;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typingEffectAnimation 2.5s steps(20, end);
+  }
+}
+.home__buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  button {
+    cursor: pointer;
+    padding: 10px 70px;
+    font-size: 2rem;
+    background: transparent;
+    color: var(--yellow-theme-main-color);
+    border: 1.5px solid var(--yellow-theme-main-color);
+    border-radius: 4px;
+    font-weight: 500;
+    margin-right: 10px;
+    &:hover {
+      background: var(--yellow-theme-main-color);
+      color: #000000;
+    }
+  }
+}
+@media only screen and (max-width: 550px) {
+  .home__text-wrapper h1 {
+    font-size: 3rem;
+    line-height: 5rem;
+  }
+}
+@media only screen and (min-width: 551px) and (max-width: 768px) {
+  .home__text-wrapper h1 {
+    font-size: 4rem;
+    line-height: 6rem;
+  }
+}
+@media only screen and (min-width: 769px) and (max-width: 990px) {
+  .home__text-wrapper h1 {
+    font-size: 6rem;
+    line-height: 8rem;
+  }
+}
+@keyframes typingEffectAnimation {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+footer {
+  background-color: #f1f1f1;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  bottom: 0;
+  margin-top: 100px;
+}
+.social-icons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  a {
+    color: var(--yellow-theme-main-color);
+    font-size: 2rem;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+    &:hover {
+      color: #000000;
+    }
+    i {
+      display: inline-block;
+    }
+  }
+  .contact-icon {
+    cursor: pointer;
+    color: var(--yellow-theme-main-color);
+    font-size: 2rem;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #000000;
+    }
+  }
+  .phone-number {
+    margin-top: 10px;
+    font-size: 1.5rem;
+    color: var(--yellow-theme-main-color);
+  }
+}
